@@ -1,1 +1,2 @@
-# ics344_project
+# ICS 344 Project Repo
+
