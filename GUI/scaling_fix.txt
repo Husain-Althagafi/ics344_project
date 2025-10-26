@@ -1,0 +1,4 @@
+#add this after sys to fix scaling issues when running gui.py
+# Enable High DPI scaling
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
