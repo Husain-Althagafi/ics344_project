@@ -8,9 +8,10 @@ from gui import Ui_MainWindow, QtCore
 import sys
 import os
 
-# Add parent directory to path to import aes_encryption
+# Add parent directory to path to import aes_encryption and diffie_hellman
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from aes_encryption import AESEncryption
+from diffie_hellman import DiffieHellman
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -23,9 +24,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)  # Set up the UI from gui.py
         
-        # Initialize SHARED AES encryption key for communication
-        # In real-world, this would be exchanged securely via key exchange protocol
-        self.shared_aes = AESEncryption()
+        # Initialize Diffie-Hellman for both clients
+        self.dh_client_a = DiffieHellman()
+        self.dh_client_b = DiffieHellman()
+        
+        # Perform DH key exchange
+        self.perform_key_exchange()
+        
+        # Initialize AES encryption with the shared DH key
+        self.shared_aes = AESEncryption(self.dh_client_a.get_shared_key())
         
         # Store the shared key for both clients
         self.aes_client_a = self.shared_aes  # Client A uses shared key
@@ -35,8 +42,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.connect_signals()
         
         # Initialize log
-        self.log("System initialized. Ready to communicate.")
-        self.log(f"Shared Key: {self.shared_aes.get_key_hex()[:32]}...")
+        self.log("System initialized with Diffie-Hellman key exchange ✓")
+        self.log(f"Client A Public Key: {self.dh_client_a.get_public_key_hex()[:32]}...")
+        self.log(f"Client B Public Key: {self.dh_client_b.get_public_key_hex()[:32]}...")
+        self.log(f"Shared AES Key: {self.shared_aes.get_key_hex()[:32]}...")
+    
+    def perform_key_exchange(self):
+        """Perform Diffie-Hellman key exchange between Client A and Client B"""
+        # Get public keys
+        client_a_public = self.dh_client_a.get_public_key()
+        client_b_public = self.dh_client_b.get_public_key()
+        
+        # Exchange and compute shared secrets
+        self.dh_client_a.compute_shared_secret(client_b_public)
+        self.dh_client_b.compute_shared_secret(client_a_public)
+        
+        # Verify both clients have the same shared key
+        if self.dh_client_a.get_shared_key() != self.dh_client_b.get_shared_key():
+            raise ValueError("DH Key exchange failed - keys don't match!")
     
     def connect_signals(self):
         """Connect all button clicks to their handler methods"""
