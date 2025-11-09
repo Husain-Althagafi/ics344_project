@@ -220,8 +220,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def simulate_message_injection(self):
         """Simulate message injection attack"""
+        self.log("Simulate message attack: sending a hijacked message to client A")
         injected = "HACKED MESSAGE"
-        self.text_A.setPlainText(injected)
+
+        shared_key = self.shared_aes
+
+        try:
+            # Encrypt the hijacked message
+            encrypted = shared_key.encrypt(injected)
+            
+            # Send to client A
+            self.text_A.setPlainText(encrypted)
+            
+            self.log(f"Hijacked message sent to client A")
+            self.log(f"Key (hex): {shared_key.get_key_hex()[:32]}...")
+        except Exception as e:
+            self.log(f"Error with simulating the hijacked message attack: {str(e)}")
+
         self.log("Message Injection: Malicious message injected")
     
     def simulate_session_hijack(self):
