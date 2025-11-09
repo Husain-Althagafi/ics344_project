@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from collections import deque
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -54,13 +54,25 @@ class Ui_MainWindow(object):
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
-        self.log_panel = QtWidgets.QLabel(self.centralwidget)
+        # self.log_panel = QtWidgets.QLabel(self.centralwidget)
+        # self.log_panel.setGeometry(QtCore.QRect(0, 410, 801, 141))
+        # font = QtGui.QFont()
+        # font.setPointSize(14)
+        # self.log_panel.setFont(font)
+        # self.log_panel.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
+        # self.log_panel.setObjectName("log_panel")
+
+        self.log_panel = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.log_panel.setGeometry(QtCore.QRect(0, 410, 801, 141))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.log_panel.setFont(font)
-        self.log_panel.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
+        self.log_panel.setReadOnly(True)
         self.log_panel.setObjectName("log_panel")
+        # optional: start with a single-line header
+        self.log_panel.setPlainText("System Logs")
+
+
         self.button_attack = QtWidgets.QPushButton(self.centralwidget)
         self.button_attack.setGeometry(QtCore.QRect(410, 380, 100, 30))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
@@ -121,7 +133,7 @@ class Ui_MainWindow(object):
         self.button_A_DV.setText(_translate("MainWindow", "Decrypt & Verify"))
         self.button_B_DV.setText(_translate("MainWindow", "Decrypt & Verify"))
         self.button_B_ES.setText(_translate("MainWindow", "Encrypt & Send"))
-        self.log_panel.setText(_translate("MainWindow", "System Logs"))
+        self.log_panel.setPlainText(_translate("MainWindow", "System Logs"))
         self.button_attack.setText(_translate("MainWindow", "Simulate"))
         self.attack_type.setItemText(0, _translate("MainWindow", "Dictionary"))
         self.attack_type.setItemText(1, _translate("MainWindow", "Message Injection"))
@@ -135,7 +147,10 @@ class Ui_MainWindow(object):
         self.actionexport.setStatusTip(_translate("MainWindow", "Export current file"))
         self.actionexport.setShortcut(_translate("MainWindow", "Ctrl+X"))
         self.actionPrint_Logs.setText(_translate("MainWindow", "Print Logs"))
-
+    
+    def init_logs(self, max_lines: int = 2000):
+        """Call this once after setupUi to initialize the log buffer."""
+        self._log_buffer = deque(maxlen=max_lines)
 
 if __name__ == "__main__":
     import sys

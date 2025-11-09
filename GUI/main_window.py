@@ -3,10 +3,11 @@ Main Window Controller
 Handles all the logic and connects the GUI buttons to functionality
 """
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from gui import Ui_MainWindow, QtCore
 import sys
 import os
+from collections import deque
 
 # Add parent directory to path to import aes_encryption and diffie_hellman
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -41,6 +42,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Connect buttons to methods
         self.connect_signals()
         
+        self._log_buffer = deque(maxlen=2000)
+
         # Initialize log
         self.log("System initialized with Diffie-Hellman key exchange ✓")
         self.log(f"Client A Public Key: {self.dh_client_a.get_public_key_hex()[:32]}...")
@@ -74,11 +77,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def log(self, message):
         """Add a message to the log panel"""
-        current_text = self.log_panel.text()
-        if current_text == "System Logs":
-            self.log_panel.setText(message)
-        else:
-            self.log_panel.setText(current_text + "\n" + message)
+        # current_text = self.log_panel.text()
+        # if current_text == "System Logs":
+        #     self.log_panel.setText(message)
+        # else:
+        #     self.log_panel.setText(current_text + "\n" + message)
+
+        if message is None:
+            return
+        
+        self._log_buffer.append(message)
+
+        sb = self.log_panel.verticalScrollBar()
+        at_bottom = (sb.value() == sb.maximum())
+
+        self.log_panel.setPlainText("\n".join(self._log_buffer))
+
+        if at_bottom:
+            cursor = self.log_panel.textCursor()
+            cursor.movePosition(QtGui.QTextCursor.End)
+            self.log_panel.setTextCursor(cursor)
+            self.log_panel.ensureCursorVisible()
     
     # Client A Methods
     def client_a_encrypt_send(self):
@@ -172,7 +191,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def simulate_dictionary_attack(self):
         """Simulate a dictionary attack on encrypted messages"""
         self.log("Dictionary Attack: Attempting to crack encryption...")
-        self.log("Dictionary Attack: Failed - AES-256 is secure ✓")
+        
+        total_attempts = 0
+        
+        try:
+            from dictionary import passwords
+
+            shared_key = self.shared_aes
+            match = False
+
+            while not match:
+                password = passwords[total_attempts]
+                total_attempts += 1
+
+                if password == shared_key:
+                    self.log(f'Dictionary attack successful, key: {self.shared_aes} matches dictionary value : {password}')
+                    match = True
+
+                else:
+                    self.log(f'Attempt number {total_attempts}: dictionary password: {password} -  No Match')
+
+            if not match:
+                self.log("Dictionary Attack: Failed - AES-256 is secure ✓")        
+
+        except Exception as e:
+            print('An error occured when simulating the dictionary attack:', e)
+
+
+
     
     def simulate_message_injection(self):
         """Simulate message injection attack"""
