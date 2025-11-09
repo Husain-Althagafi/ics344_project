@@ -200,9 +200,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             shared_key = self.shared_aes
             match = False
 
-            while not match:
-                password = passwords[total_attempts]
-                total_attempts += 1
+            while not match and total_attempts < len(passwords):
+                password = passwords[total_attempts]                
+                total_attempts += 1                
 
                 if password == shared_key:
                     self.log(f'Dictionary attack successful, key: {self.shared_aes} matches dictionary value : {password}')
@@ -216,8 +216,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         except Exception as e:
             print('An error occured when simulating the dictionary attack:', e)
-
-
 
     
     def simulate_message_injection(self):
