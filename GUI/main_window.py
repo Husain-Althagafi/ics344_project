@@ -242,13 +242,44 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def simulate_session_hijack(self):
         """Simulate session hijacking"""
         self.log("Session Hijack: Attempting to steal session...")
-        self.log("Session Hijack: Detection mechanisms active ✓")
-    
-    def simulate_flooding(self):
+
+        attacker_dh = DiffieHellman()
+        attacker_dh.compute_shared_secret(self.dh_client_a.get_public_key())
+        fake_shared_key = attacker_dh.get_shared_key()
+        fake_aes = AESEncryption(fake_shared_key)
+
+        try:
+            encrypted = fake_aes.encrypt('Session Hijacked')
+            self.text_A.setPlainText(encrypted)
+            self.log("Session Hijacked: message sent using hijacked key")
+            self.log(f"Forged Key (hex): {fake_aes.get_key_hex()[:32]}...")
+
+            encrypted_text = self.text_A.toPlainText()
+            
+            if not encrypted_text:
+                self.log("Client A: No message to decrypt")
+                return
+            
+            try:
+                # Use the shared key to decrypt (message was encrypted by Client B)
+                decrypted = fake_aes.decrypt(encrypted_text)
+                self.text_A.setPlainText(decrypted)
+                self.log("Client A: Hijacked Session Message decrypted successfully ✓")
+            except Exception as e:
+                self.log(f"Client A: Decryption failed - {str(e)}")
+        
+
+        except Exception as e:
+            self.log(f"Session Hijack: Error simulating attack: {str(e)}")
+
+    def simulate_flooding(self):    
         """Simulate message flooding attack"""
         self.log("Flooding Attack: Sending multiple messages...")
-        for i in range(5):
-            self.log(f"Flood message {i+1}")
+        for i in range(10000):
+            encrypted = self.shared_aes.encrypt(f'flood {i}')
+            decrypted = self.shared_aes.decrypt(encrypted)
+            self.text_A.setPlainText(decrypted)
+            self.log(f'sent flood msg {i}')            
     
     # Menu Actions
     def print_logs(self):
