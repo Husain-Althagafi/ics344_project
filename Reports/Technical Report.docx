@@ -1,0 +1,1170 @@
+
+      <html xmlns:o='urn:schemas-microsoft-com:office:office'
+            xmlns:w='urn:schemas-microsoft-com:office:word'
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+          <meta charset="utf-8">
+          <title>Exported Document</title>
+          <style>
+              body { font-family: Arial, sans-serif; }
+          </style>
+      </head>
+      <body>
+          <h1 id="ics344securecommunicationsystemtechnicalreport">ICS344 Secure Communication System - Technical Report</h1>
+<p><strong>Course:</strong> ICS 344 – Information Security<br />
+<strong>Project:</strong> Cryptography in Action – Secure Messaging Application<br />
+<strong>Bucket Assignment:</strong> P01 (Python | AES-CBC PKCS#7 | Diffie-Hellman | Desktop)<br />
+<strong>Institution:</strong> King Fahd University of Petroleum &amp; Minerals<br />
+<strong>Department:</strong> Information and Computer Science<br />
+<strong>Date:</strong> November 2025</p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>This report presents the design, implementation, and evaluation of a secure communication system developed as part of the ICS344 Information Security course project. The system demonstrates fundamental cryptographic principles including symmetric encryption, key exchange protocols, and security attack simulations. Built as a desktop application using Python and PyQt5, the system implements AES-256 encryption in CBC mode with PKCS#7 padding, utilizes the classic Diffie-Hellman protocol for secure key exchange, and provides interactive simulations of four common security attacks: dictionary attacks, message injection, session hijacking, and message flooding. This report details the cryptographic design decisions, implementation architecture, user interface design, attack simulation methodologies, and provides a comprehensive security evaluation including identified limitations and potential improvements.</p>
+<p><strong>Keywords:</strong> Cryptography, AES-CBC, Diffie-Hellman, Secure Communication, Attack Simulation, Desktop Security Application</p>
+<hr />
+<h2 id="tableofcontents">Table of Contents</h2>
+<ol>
+<li><a href="#1-introduction">Introduction</a></li>
+<li><a href="#2-project-objectives">Project Objectives</a></li>
+<li><a href="#3-cryptographic-design">Cryptographic Design</a></li>
+<li><a href="#4-system-architecture">System Architecture</a></li>
+<li><a href="#5-gui-design-and-workflow">GUI Design and Workflow</a></li>
+<li><a href="#6-attack-simulations">Attack Simulations</a></li>
+<li><a href="#7-security-evaluation">Security Evaluation</a></li>
+<li><a href="#8-limitations-and-future-work">Limitations and Future Work</a></li>
+<li><a href="#9-conclusion">Conclusion</a></li>
+<li><a href="#10-references">References</a></li>
+</ol>
+<hr />
+<h2 id="1introduction">1. Introduction</h2>
+<h3 id="11background">1.1 Background</h3>
+<p>In modern digital communications, ensuring the confidentiality, integrity, and authenticity of transmitted data is paramount. Cryptographic protocols form the foundation of secure communication systems, from messaging applications to financial transactions. Understanding how these protocols work, their strengths, and their vulnerabilities is essential for computer science students and security professionals.</p>
+<p>This project implements a functional secure messaging system that demonstrates core cryptographic concepts in an accessible, interactive manner. Unlike theoretical discussions of cryptography, this application allows users to observe encryption and decryption in real-time, witness key exchange protocols in action, and understand how various security attacks can threaten or fail against properly implemented cryptographic systems.</p>
+<h3 id="12projectscope">1.2 Project Scope</h3>
+<p>The Secure Communication System is a desktop-based application developed according to the P01 bucket specifications, which mandates:</p>
+<ul>
+<li>Implementation language: Python</li>
+<li>Encryption algorithm: AES in CBC mode with PKCS#7 padding</li>
+<li>Key exchange protocol: Classic Diffie-Hellman</li>
+<li>Platform: Desktop application</li>
+<li>Required attack simulations: Dictionary, Message Injection, Session Hijacking, and Flooding</li>
+</ul>
+<p>The application simulates a two-client communication scenario within a single window, allowing users to observe the complete workflow of secure message exchange from key establishment to encrypted transmission and decryption.</p>
+<h3 id="13motivation">1.3 Motivation</h3>
+<p>Several factors motivated the development of this project:</p>
+<p><strong>Educational Value:</strong> Cryptography courses often focus on mathematical foundations without providing hands-on experience with real implementations. This project bridges that gap by offering an interactive learning tool.</p>
+<p><strong>Practical Understanding:</strong> By implementing cryptographic algorithms and protocols from scratch (using industry-standard libraries), students gain insight into the challenges and considerations that arise in real-world security applications.</p>
+<p><strong>Security Awareness:</strong> The attack simulation component demonstrates that even strong cryptographic primitives can be vulnerable to implementation flaws or protocol-level attacks, emphasizing the importance of holistic security design.</p>
+<p><strong>Portfolio Development:</strong> This project serves as a demonstration of competency in security programming, suitable for academic assessment and professional portfolios.</p>
+<h3 id="14documentorganization">1.4 Document Organization</h3>
+<p>The remainder of this report is organized as follows: Section 2 outlines the specific objectives and requirements of the project. Section 3 provides detailed explanation of the cryptographic design, including algorithm selection, mode of operation, and key sizes. Section 4 describes the overall system architecture and component interactions. Section 5 presents the GUI design with workflow diagrams. Section 6 details each attack simulation and its defense mechanisms. Section 7 evaluates the security of the implementation, and Section 8 discusses limitations and potential improvements. Finally, Section 9 concludes the report.</p>
+<hr />
+<h2 id="2projectobjectives">2. Project Objectives</h2>
+<h3 id="21primaryobjectives">2.1 Primary Objectives</h3>
+<p>The primary objectives of this project were established based on the ICS344 course requirements and the P01 bucket specifications:</p>
+<p><strong>Objective 1: Implement Symmetric Encryption</strong><br />
+Develop a working implementation of AES-256 encryption using Cipher Block Chaining (CBC) mode with PKCS#7 padding. The implementation must correctly encrypt plaintext messages and decrypt ciphertext back to the original plaintext, demonstrating understanding of block cipher modes and padding schemes.</p>
+<p><strong>Objective 2: Implement Secure Key Exchange</strong><br />
+Implement the classic Diffie-Hellman key exchange protocol to enable two parties to establish a shared secret key over an insecure channel. The implementation must use cryptographically secure parameters and properly derive encryption keys from the shared secret.</p>
+<p><strong>Objective 3: Create Interactive User Interface</strong><br />
+Design and implement a graphical user interface that allows users to interact with the cryptographic functions intuitively, providing clear feedback through logging and visual indicators.</p>
+<p><strong>Objective 4: Simulate Security Attacks</strong><br />
+Implement four distinct attack simulations as specified in the P01 bucket:</p>
+<ul>
+<li>Dictionary attacks against encryption keys</li>
+<li>Message injection attacks</li>
+<li>Session hijacking via man-in-the-middle</li>
+<li>Message flooding for denial-of-service</li>
+</ul>
+<p><strong>Objective 5: Demonstrate Security Principles</strong><br />
+Through the combined functionality of encryption, key exchange, and attack simulations, demonstrate fundamental security principles including confidentiality, the importance of key management, and the distinction between encryption and authentication.</p>
+<h3 id="22technicalrequirements">2.2 Technical Requirements</h3>
+<p>Beyond the high-level objectives, specific technical requirements guided the implementation:</p>
+<ul>
+<li>Use Python 3.8 or higher as the implementation language</li>
+<li>Utilize the pycryptodome library for cryptographic primitives</li>
+<li>Implement a desktop GUI using PyQt5 framework</li>
+<li>Support cross-platform operation (Windows, macOS, Linux)</li>
+<li>Provide comprehensive logging of all security-relevant events</li>
+<li>Ensure proper error handling and input validation</li>
+<li>Follow secure coding practices and avoid common vulnerabilities</li>
+</ul>
+<h3 id="23learningoutcomes">2.3 Learning Outcomes</h3>
+<p>Upon completion of this project, the development team achieved the following learning outcomes:</p>
+<ol>
+<li>Practical experience implementing cryptographic algorithms using industry-standard libraries</li>
+<li>Understanding of the differences between cryptographic modes (specifically CBC mode operation)</li>
+<li>Hands-on knowledge of key exchange protocols and their security properties</li>
+<li>Appreciation for the complexity of building secure systems beyond just using encryption</li>
+<li>Familiarity with common attack vectors and defensive strategies</li>
+<li>Experience with GUI programming for security applications</li>
+<li>Understanding of the limitations of individual security mechanisms and the need for defense-in-depth</li>
+</ol>
+<hr />
+<h2 id="3cryptographicdesign">3. Cryptographic Design</h2>
+<p>This section details the cryptographic components of the system, explaining the rationale behind algorithm selection, parameter choices, and implementation decisions.</p>
+<h3 id="31symmetricencryptionaescbc">3.1 Symmetric Encryption: AES-CBC</h3>
+<h4 id="311algorithmselection">3.1.1 Algorithm Selection</h4>
+<p>The Advanced Encryption Standard (AES) was selected as the symmetric encryption algorithm for this project. AES is a widely adopted encryption standard established by the U.S. National Institute of Standards and Technology (NIST) in 2001. Several factors justified this choice:</p>
+<p><strong>Security:</strong> AES has withstood over two decades of cryptanalysis and is considered secure against all known practical attacks when used with appropriate key sizes and modes of operation.</p>
+<p><strong>Performance:</strong> AES benefits from hardware acceleration in modern processors (AES-NI instruction set), making it efficient even for resource-constrained applications.</p>
+<p><strong>Standardization:</strong> AES is mandated or recommended by numerous security standards and regulations, including FIPS 197, making it a practical choice for real-world applications.</p>
+<p><strong>Availability:</strong> High-quality, well-tested implementations of AES are readily available in cryptographic libraries, reducing the risk of implementation flaws.</p>
+<h4 id="312modeofoperationcbc">3.1.2 Mode of Operation: CBC</h4>
+<p>The Cipher Block Chaining (CBC) mode was selected as specified in the P01 bucket requirements. CBC is a block cipher mode that provides several important security properties:</p>
+<p><strong>Plaintext Pattern Hiding:</strong> In CBC mode, each plaintext block is XORed with the previous ciphertext block before encryption. This ensures that identical plaintext blocks produce different ciphertext blocks, hiding patterns in the plaintext.</p>
+<p><strong>Initialization Vector (IV):</strong> CBC requires a random initialization vector for the first block. Our implementation generates a cryptographically secure random IV for each message, ensuring that encrypting the same message twice produces different ciphertexts.</p>
+<p><strong>Error Propagation:</strong> In CBC mode, a single bit error in the ciphertext affects the decryption of two blocks, which can be useful for detecting tampering (though dedicated integrity mechanisms are preferred).</p>
+<p>The encryption process in CBC mode follows this formula for each block <em>i</em>:</p>
+<pre><code>C[0] = IV
+C[i] = E(K, P[i] ⊕ C[i-1])
+</code></pre>
+<p>Where:</p>
+<ul>
+<li>C[i] = ciphertext block i</li>
+<li>E = encryption function</li>
+<li>K = encryption key</li>
+<li>P[i] = plaintext block i</li>
+<li>⊕ = XOR operation</li>
+<li>IV = initialization vector</li>
+</ul>
+<p><strong>PLACEHOLDER FOR DIAGRAM: CBC mode encryption illustration showing IV, plaintext blocks, XOR operations, and ciphertext blocks</strong></p>
+<h4 id="313paddingschemepkcs7">3.1.3 Padding Scheme: PKCS#7</h4>
+<p>Block ciphers like AES operate on fixed-size blocks (128 bits for AES). Messages that are not multiples of the block size must be padded. This implementation uses PKCS#7 padding as specified in the bucket requirements.</p>
+<p>PKCS#7 padding works as follows:</p>
+<ul>
+<li>If N bytes of padding are needed, append N bytes each with value N</li>
+<li>For example, if 5 bytes of padding are needed, append: 0x05 0x05 0x05 0x05 0x05</li>
+<li>If the message is already a multiple of the block size, append a full block of padding</li>
+</ul>
+<p>This padding scheme is unambiguous and allows for reliable detection of padding during decryption.</p>
+<h4 id="314keysize256bits">3.1.4 Key Size: 256 bits</h4>
+<p>This implementation uses AES-256, meaning a 256-bit (32-byte) encryption key. This key size provides a security level of 256 bits, which is more than sufficient for current and foreseeable future threat models.</p>
+<p>To put this in perspective, attempting to brute-force a 256-bit key would require checking 2^256 possible keys. Even if an attacker could check one trillion (10^12) keys per second, it would take approximately 10^57 years to try all possibilities—many orders of magnitude longer than the age of the universe.</p>
+<h4 id="315implementationdetails">3.1.5 Implementation Details</h4>
+<p>The AES-CBC implementation is provided by the pycryptodome library, a well-maintained fork of PyCrypto. The implementation follows this workflow:</p>
+<p><strong>Encryption:</strong></p>
+<pre><code class="python language-python">1. Generate random 16-byte IV
+2. Convert plaintext string to UTF-8 bytes
+3. Apply PKCS#7 padding to plaintext bytes
+4. Create AES cipher object in CBC mode with key and IV
+5. Encrypt padded plaintext
+6. Concatenate IV + ciphertext
+7. Encode result as Base64 for transmission/display
+</code></pre>
+<p><strong>Decryption:</strong></p>
+<pre><code class="python language-python">1. Decode Base64 to get IV + ciphertext bytes
+2. Extract IV (first 16 bytes)
+3. Extract ciphertext (remaining bytes)
+4. Create AES cipher object in CBC mode with key and IV
+5. Decrypt ciphertext
+6. Remove PKCS#7 padding
+7. Convert bytes to UTF-8 string
+</code></pre>
+<p><strong>PLACEHOLDER FOR CODE SNIPPET: Key sections of AES encryption/decryption implementation</strong></p>
+<h3 id="32keyexchangediffiehellman">3.2 Key Exchange: Diffie-Hellman</h3>
+<h4 id="321protocoloverview">3.2.1 Protocol Overview</h4>
+<p>The Diffie-Hellman (DH) key exchange protocol, invented by Whitfield Diffie and Martin Hellman in 1976, enables two parties to establish a shared secret over an insecure channel. The security of DH relies on the computational difficulty of the discrete logarithm problem.</p>
+<p>The classic DH protocol operates as follows:</p>
+<p><strong>Setup (Public Parameters):</strong></p>
+<ul>
+<li>Large prime number p (modulus)</li>
+<li>Generator g (primitive root modulo p)</li>
+</ul>
+<p><strong>Key Exchange:</strong></p>
+<ol>
+<li>Alice generates random private key a, computes public key A = g^a mod p</li>
+<li>Bob generates random private key b, computes public key B = g^b mod p</li>
+<li>Alice and Bob exchange public keys (A and B) over insecure channel</li>
+<li>Alice computes shared secret: s = B^a mod p</li>
+<li>Bob computes shared secret: s = A^b mod p</li>
+<li>Both parties now share secret s = g^(ab) mod p</li>
+</ol>
+<p>An eavesdropper observing the exchange sees only g, p, A, and B. Computing the shared secret from these values requires solving the discrete logarithm problem, which is computationally infeasible for properly chosen parameters.</p>
+<p><strong>PLACEHOLDER FOR DIAGRAM: Diffie-Hellman key exchange sequence diagram showing Alice, Bob, and eavesdropper</strong></p>
+<h4 id="322parameterselection">3.2.2 Parameter Selection</h4>
+<p>This implementation uses the 2048-bit MODP Group 14 from RFC 3526, a standardized set of Diffie-Hellman parameters. The specific parameters are:</p>
+<p><strong>Prime (p):</strong> A 2048-bit safe prime (a prime of the form p = 2q + 1 where q is also prime)</p>
+<p><strong>Generator (g):</strong> 2</p>
+<p>These parameters are considered secure for current applications and are widely used in protocols like TLS and IPsec. The 2048-bit key size provides approximately 112 bits of security, which is sufficient protection against modern attacks.</p>
+<h4 id="323keyderivation">3.2.3 Key Derivation</h4>
+<p>The raw shared secret computed by Diffie-Hellman is a large integer. To use this as an AES key, we must derive a fixed-length key material. This implementation uses SHA-256 hashing for key derivation:</p>
+<pre><code>shared_secret_int = g^(ab) mod p
+shared_secret_bytes = int_to_bytes(shared_secret_int, 256 bytes)
+aes_key = SHA256(shared_secret_bytes)  # Produces 32 bytes for AES-256
+</code></pre>
+<p>This approach ensures:</p>
+<ul>
+<li>Fixed output length (256 bits) suitable for AES-256</li>
+<li>Uniform distribution of key bits</li>
+<li>One-way transformation (computing shared_secret from aes_key is infeasible)</li>
+</ul>
+<h4 id="324securityproperties">3.2.4 Security Properties</h4>
+<p>The Diffie-Hellman implementation provides the following security properties:</p>
+<p><strong>Passive Eavesdropping Resistance:</strong> An attacker who observes the public key exchange cannot compute the shared secret without solving the discrete logarithm problem.</p>
+<p><strong>Forward Secrecy (Session Level):</strong> Each session uses freshly generated DH parameters. If the session keys are later compromised, past sessions remain secure (though this implementation reuses the same DH keys for the application lifetime).</p>
+<p><strong>No Pre-Shared Secrets Required:</strong> Unlike symmetric key exchange, DH allows two parties to establish a shared secret without any prior secret communication.</p>
+<p>However, it's important to note that classic DH alone does not provide:</p>
+<ul>
+<li>Authentication (vulnerable to active man-in-the-middle attacks)</li>
+<li>Non-repudiation</li>
+<li>Message integrity</li>
+</ul>
+<p>These limitations are discussed further in Section 7.</p>
+<h3 id="33randomnumbergeneration">3.3 Random Number Generation</h3>
+<p>Cryptographic security depends critically on the quality of random numbers used for keys, IVs, and other secrets. This implementation uses Python's <code>secrets</code> module and pycryptodome's <code>get_random_bytes()</code> function, both of which utilize the operating system's cryptographically secure random number generator:</p>
+<ul>
+<li>On Linux: /dev/urandom</li>
+<li>On Windows: CryptGenRandom</li>
+<li>On macOS: /dev/urandom</li>
+</ul>
+<p>These sources provide high-quality randomness suitable for cryptographic applications.</p>
+<h3 id="34base64encoding">3.4 Base64 Encoding</h3>
+<p>Encrypted data is binary, which can cause issues when transmitted or displayed. This implementation encodes all ciphertext using Base64 encoding, which:</p>
+<ul>
+<li>Converts binary data to ASCII text</li>
+<li>Allows safe transmission through text-based channels</li>
+<li>Enables easy copying and pasting in the GUI</li>
+<li>Increases size by approximately 33% (acceptable overhead)</li>
+</ul>
+<hr />
+<h2 id="4systemarchitecture">4. System Architecture</h2>
+<p>This section describes the overall architecture of the secure communication system, including component organization, data flow, and design patterns employed.</p>
+<h3 id="41componentoverview">4.1 Component Overview</h3>
+<p>The system is organized into three primary components:</p>
+<p><strong>Cryptographic Layer</strong> (<code>aes_encryption.py</code>, <code>diffie_hellman.py</code>)<br />
+Provides core cryptographic functionality including encryption, decryption, and key exchange. This layer is independent of the GUI and could be reused in other applications.</p>
+<p><strong>User Interface Layer</strong> (<code>GUI/gui.py</code>, <code>GUI/main_window.py</code>)<br />
+Handles all user interactions, displays, and event processing. The GUI is generated from Qt Designer files and extended with custom logic.</p>
+<p><strong>Application Logic Layer</strong> (<code>GUI/main_window.py</code>)<br />
+Coordinates between the cryptographic and UI layers, implements attack simulations, and manages application state.</p>
+<p><strong>PLACEHOLDER FOR DIAGRAM: System architecture diagram showing three layers and their interactions</strong></p>
+<h3 id="42moduledescriptions">4.2 Module Descriptions</h3>
+<h4 id="421aesencryptionmodule">4.2.1 AES Encryption Module</h4>
+<p><strong>File:</strong> <code>aes_encryption.py</code></p>
+<p>This module encapsulates all AES-CBC encryption and decryption functionality. It exposes a simple class-based interface:</p>
+<pre><code class="python language-python">class AESEncryption:
+    def __init__(self, key=None)
+    def encrypt(self, plaintext) -&gt; str
+    def decrypt(self, encrypted_data) -&gt; str
+    def get_key_hex(self) -&gt; str
+</code></pre>
+<p><strong>Key Design Decisions:</strong></p>
+<ul>
+<li>Automatic IV generation and inclusion in ciphertext</li>
+<li>Automatic padding handling</li>
+<li>String-based interface (accepts and returns strings, not bytes)</li>
+<li>Base64 encoding for ciphertext output</li>
+</ul>
+<h4 id="422diffiehellmanmodule">4.2.2 Diffie-Hellman Module</h4>
+<p><strong>File:</strong> <code>diffie_hellman.py</code></p>
+<p>This module implements the classic DH protocol using standardized parameters:</p>
+<pre><code class="python language-python">class DiffieHellman:
+    def __init__(self)
+    def get_public_key(self) -&gt; int
+    def compute_shared_secret(self, other_public_key: int)
+    def get_shared_key(self) -&gt; bytes
+</code></pre>
+<p><strong>Key Design Decisions:</strong></p>
+<ul>
+<li>Uses RFC 3526 Group 14 parameters (2048-bit)</li>
+<li>SHA-256 key derivation for AES compatibility</li>
+<li>Separate methods for key generation and secret computation</li>
+</ul>
+<h4 id="423guimodule">4.2.3 GUI Module</h4>
+<p><strong>File:</strong> <code>GUI/gui.py</code> (auto-generated)</p>
+<p>This file contains the PyQt5 GUI code generated from the Qt Designer <code>.ui</code> file. It should not be edited manually as it will be overwritten when the UI design is modified.</p>
+<p><strong>File:</strong> <code>GUI/main_window.py</code> (custom logic)</p>
+<p>This file extends the auto-generated GUI with application-specific logic:</p>
+<ul>
+<li>Button click handlers</li>
+<li>Message encryption/decryption logic</li>
+<li>Attack simulation implementations</li>
+<li>Log management</li>
+<li>State tracking for replay detection</li>
+</ul>
+<p>This separation allows the GUI design to be modified independently of the application logic.</p>
+<h3 id="43dataflow">4.3 Data Flow</h3>
+<h4 id="431applicationstartupflow">4.3.1 Application Startup Flow</h4>
+<pre><code>1. Application starts
+   ↓
+2. Initialize PyQt5 application
+   ↓
+3. Create DH instances for Client A and Client B
+   ↓
+4. Perform DH key exchange
+   ├→ Client A generates private/public key pair
+   ├→ Client B generates private/public key pair
+   ├→ Exchange public keys
+   ├→ Both compute shared secret
+   └→ Derive AES key via SHA-256
+   ↓
+5. Initialize AES encryption with shared key
+   ↓
+6. Display GUI window
+   ↓
+7. Log key exchange completion
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Application startup showing DH key exchange logs</strong></p>
+<h4 id="432messageencryptionflow">4.3.2 Message Encryption Flow</h4>
+<pre><code>User types message in Client A
+   ↓
+User clicks "Encrypt &amp; Send"
+   ↓
+main_window.py: client_a_encrypt_send()
+   ↓
+Call aes_encryption.encrypt(plaintext)
+   ├→ Generate random IV
+   ├→ Pad plaintext
+   ├→ Encrypt with AES-CBC
+   ├→ Concatenate IV + ciphertext
+   └→ Base64 encode
+   ↓
+Display ciphertext in Client B text area
+   ↓
+Log encryption event
+</code></pre>
+<h4 id="433messagedecryptionflow">4.3.3 Message Decryption Flow</h4>
+<pre><code>Ciphertext present in Client B text area
+   ↓
+User clicks "Decrypt &amp; Verify"
+   ↓
+main_window.py: client_b_decrypt_verify()
+   ↓
+Call aes_encryption.decrypt(ciphertext)
+   ├→ Base64 decode
+   ├→ Extract IV and ciphertext
+   ├→ Decrypt with AES-CBC
+   └→ Remove padding
+   ↓
+Display plaintext in Client B text area
+   ↓
+Log successful decryption
+</code></pre>
+<h3 id="44designpatterns">4.4 Design Patterns</h3>
+<p>Several software design patterns were employed to ensure maintainability and extensibility:</p>
+<p><strong>Model-View-Controller (MVC):</strong> The separation of GUI (View), cryptographic modules (Model), and main_window.py (Controller) follows MVC principles.</p>
+<p><strong>Singleton Pattern:</strong> Only one instance of the main window exists, managing application state centrally.</p>
+<p><strong>Facade Pattern:</strong> The AESEncryption and DiffieHellman classes provide simple interfaces hiding complex cryptographic operations.</p>
+<p><strong>Observer Pattern:</strong> The logging system acts as an observer, receiving notifications of security events.</p>
+<hr />
+<h2 id="5guidesignandworkflow">5. GUI Design and Workflow</h2>
+<p>This section presents the graphical user interface design, explains the workflow for typical operations, and provides visual diagrams of the user interaction patterns.</p>
+<h3 id="51interfacelayout">5.1 Interface Layout</h3>
+<p>The application window is divided into several functional areas:</p>
+<p><strong>Client A Panel (Left Side):</strong></p>
+<ul>
+<li>Large text area for composing/viewing messages</li>
+<li>"Encrypt &amp; Send" button</li>
+<li>"Decrypt &amp; Verify" button</li>
+</ul>
+<p><strong>Client B Panel (Right Side):</strong></p>
+<ul>
+<li>Large text area for composing/viewing messages  </li>
+<li>"Encrypt &amp; Send" button</li>
+<li>"Decrypt &amp; Verify" button</li>
+</ul>
+<p><strong>Central Divider:</strong></p>
+<ul>
+<li>Visual separator between the two clients</li>
+</ul>
+<p><strong>Attack Simulation Controls (Bottom Center):</strong></p>
+<ul>
+<li>Dropdown menu for attack selection</li>
+<li>"Simulate" button to trigger the selected attack</li>
+</ul>
+<p><strong>System Log Panel (Bottom):</strong></p>
+<ul>
+<li>Scrollable text area displaying security events</li>
+<li>Auto-scrolling to latest messages</li>
+<li>Shows key exchange, encryption, decryption, and attack events</li>
+</ul>
+<p><strong>Menu Bar (Top):</strong></p>
+<ul>
+<li>File menu with options for printing logs</li>
+</ul>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Main application window with all components labeled</strong></p>
+<h3 id="52designrationale">5.2 Design Rationale</h3>
+<p>The interface was designed with several principles in mind:</p>
+<p><strong>Clarity:</strong> The two-panel design makes it immediately obvious that this is a two-party communication system. Users can clearly see the message flow from one client to another.</p>
+<p><strong>Simplicity:</strong> Each client has only two buttons, reducing cognitive load. The attack simulation uses a simple dropdown + button pattern.</p>
+<p><strong>Feedback:</strong> The log panel provides continuous feedback about what the system is doing, which is essential for educational purposes.</p>
+<p><strong>Visibility:</strong> Both plaintext and ciphertext are visible simultaneously, allowing users to observe the transformation that encryption provides.</p>
+<p><strong>Consistency:</strong> Both clients have identical interfaces, emphasizing the symmetric nature of the communication.</p>
+<h3 id="53workflowdiagrams">5.3 Workflow Diagrams</h3>
+<h4 id="531standardmessageexchangeworkflow">5.3.1 Standard Message Exchange Workflow</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Standard Secure Message Exchange                            │
+└─────────────────────────────────────────────────────────────┘
+
+[User] ──┐
+         │
+         ├─→ Types message in Client A text area
+         │
+         ├─→ Clicks "Encrypt &amp; Send" button
+         │
+[System]──┤
+         ├─→ Encrypts message with AES-CBC
+         │
+         ├─→ Displays ciphertext in Client B text area
+         │
+         ├─→ Logs encryption event
+         │
+[User] ──┤
+         ├─→ Observes encrypted message in Client B
+         │
+         ├─→ Clicks "Decrypt &amp; Verify" button
+         │
+[System]──┤
+         ├─→ Decrypts ciphertext
+         │
+         ├─→ Displays plaintext in Client B text area
+         │
+         └─→ Logs successful decryption
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Sequence showing message encryption and decryption steps</strong></p>
+<h4 id="532attacksimulationworkflow">5.3.2 Attack Simulation Workflow</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Attack Simulation Workflow                                   │
+└─────────────────────────────────────────────────────────────┘
+
+[User] ──┐
+         │
+         ├─→ Selects attack type from dropdown
+         │
+         ├─→ Clicks "Simulate" button
+         │
+[System]──┤
+         ├─→ Executes selected attack simulation
+         │
+         ├─→ Updates GUI with attack results
+         │
+         ├─→ Logs attack steps and outcomes
+         │
+         └─→ Displays defense effectiveness
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Attack simulation interface with dropdown menu and simulate button</strong></p>
+<h3 id="54userinteractionflow">5.4 User Interaction Flow</h3>
+<p>The typical user session follows this pattern:</p>
+<p><strong>Phase 1: Startup and Observation</strong></p>
+<ol>
+<li>User launches application</li>
+<li>Observes automatic DH key exchange in logs</li>
+<li>Notes the public keys and shared AES key displayed</li>
+</ol>
+<p><strong>Phase 2: Message Encryption</strong></p>
+<ol start="4">
+<li>User types a plaintext message in Client A</li>
+<li>Clicks "Encrypt &amp; Send"</li>
+<li>Observes the Base64-encoded ciphertext appear in Client B</li>
+<li>Notes the encryption logged with key information</li>
+</ol>
+<p><strong>Phase 3: Message Decryption</strong></p>
+<ol start="8">
+<li>User clicks "Decrypt &amp; Verify" in Client B</li>
+<li>Observes the original plaintext reappear</li>
+<li>Notes successful decryption logged</li>
+</ol>
+<p><strong>Phase 4: Reverse Communication</strong></p>
+<ol start="11">
+<li>User types a response in Client B</li>
+<li>Encrypts and sends to Client A</li>
+<li>Decrypts in Client A</li>
+</ol>
+<p><strong>Phase 5: Attack Exploration</strong></p>
+<ol start="14">
+<li>User selects different attacks from dropdown</li>
+<li>Observes each attack's behavior and the system's response</li>
+<li>Reads detailed logs explaining attack outcomes</li>
+</ol>
+<h3 id="55accessibilityconsiderations">5.5 Accessibility Considerations</h3>
+<p>While not the primary focus of this educational project, several accessibility features were considered:</p>
+<ul>
+<li>Clear, readable fonts at appropriate sizes</li>
+<li>High contrast between text and background</li>
+<li>Logical tab order for keyboard navigation</li>
+<li>Descriptive button labels</li>
+<li>Comprehensive text-based logging (screen reader compatible)</li>
+</ul>
+<h3 id="56qtdesignerintegration">5.6 Qt Designer Integration</h3>
+<p>The GUI was designed using Qt Designer, a visual tool for creating Qt interfaces. The workflow is:</p>
+<ol>
+<li>Design interface visually in <code>main_gui.ui</code></li>
+<li>Generate Python code with <code>pyuic5</code> tool</li>
+<li>Extend generated code in <code>main_window.py</code></li>
+</ol>
+<p>This approach provides:</p>
+<ul>
+<li>Visual design iteration without coding</li>
+<li>Automatic code generation</li>
+<li>Separation of design and logic</li>
+<li>Professional appearance with minimal effort</li>
+</ul>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Qt Designer showing the interface layout</strong></p>
+<hr />
+<h2 id="6attacksimulations">6. Attack Simulations</h2>
+<p>This section details the four attack simulations implemented in the system, explaining the attack methodology, the system's response, and the security lessons demonstrated by each simulation.</p>
+<h3 id="61dictionaryattack">6.1 Dictionary Attack</h3>
+<h4 id="611attackdescription">6.1.1 Attack Description</h4>
+<p>A dictionary attack is a brute-force method where an attacker attempts to guess a cryptographic key by trying many possibilities from a precomputed list (dictionary) of likely values. In the context of password-based encryption, attackers might try common passwords, variations, and combinations.</p>
+<p>However, this simulation demonstrates why dictionary attacks fail against properly generated cryptographic keys like those used in AES-256.</p>
+<h4 id="612implementation">6.1.2 Implementation</h4>
+<p>The dictionary attack simulation follows these steps:</p>
+<pre><code>1. Define a list of common passwords/keys:
+   ["password", "123456", "admin", "qwerty", "secret"]
+
+2. For each candidate in the list:
+   a. Log the attempt
+   b. Compare against the actual AES-256 key
+   c. Mark as FAILED
+
+3. After all attempts:
+   a. Log total failures
+   b. Explain why attack failed
+   c. Display computational infeasibility
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Dictionary attack simulation showing multiple failed attempts in logs</strong></p>
+<h4 id="613securityanalysis">6.1.3 Security Analysis</h4>
+<p>The simulation demonstrates several important concepts:</p>
+<p><strong>Key Space Size:</strong> AES-256 has a key space of 2^256 possible keys. Even attempting one trillion keys per second would require approximately 10^57 years to try all possibilities.</p>
+<p><strong>Random Key Generation:</strong> Unlike user-chosen passwords, cryptographic keys should be generated using secure random number generators, making them immune to dictionary attacks.</p>
+<p><strong>Quality of Secrets:</strong> The simulation emphasizes that the strength of encryption depends not just on the algorithm but on the quality of the key material.</p>
+<p>The logs explicitly state:</p>
+<pre><code>"Dictionary Attack: Failed - AES-256 key space is 2^256"
+"Would take billions of years"
+</code></pre>
+<p>This educational message helps users understand that computational infeasibility is a core security property.</p>
+<h4 id="614realworldcontext">6.1.4 Real-World Context</h4>
+<p>While this simulation shows dictionary attacks failing against AES keys, such attacks are effective against:</p>
+<ul>
+<li>User-chosen passwords (which should be hashed, not used directly as keys)</li>
+<li>Weak key derivation functions</li>
+<li>Systems with insufficient entropy in key generation</li>
+</ul>
+<p>The lesson is that cryptographic systems must ensure proper key generation and management to resist dictionary attacks.</p>
+<h3 id="62messageinjectionattack">6.2 Message Injection Attack</h3>
+<h4 id="621attackdescription">6.2.1 Attack Description</h4>
+<p>Message injection demonstrates that encryption alone provides confidentiality but not necessarily integrity or authenticity. In this attack, an adversary who has obtained the encryption key can create arbitrary encrypted messages that appear valid to the receiver.</p>
+<p>This attack succeeds because AES-CBC provides no built-in authentication mechanism.</p>
+<h4 id="622implementation">6.2.2 Implementation</h4>
+<p>The message injection attack proceeds as follows:</p>
+<pre><code>1. Attacker obtains the shared encryption key (simulated)
+
+2. Attacker creates malicious plaintext:
+   "HACKED MESSAGE"
+
+3. Attacker encrypts the malicious message with the shared key:
+   encrypted = aes.encrypt("HACKED MESSAGE")
+
+4. Attacker injects the encrypted message into Client A's text area
+
+5. System logs the injection with key information
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Message injection attack showing forged encrypted message in Client A</strong></p>
+<h4 id="623securityanalysis">6.2.3 Security Analysis</h4>
+<p>This simulation illustrates critical security principles:</p>
+<p><strong>Encryption ≠ Authentication:</strong> AES-CBC encrypts data but doesn't verify who created it. An attacker with the key can impersonate any party.</p>
+<p><strong>Need for Message Authentication Codes (MACs):</strong> To prevent message injection, systems should use authenticated encryption modes (like AES-GCM) or add separate MAC/HMAC verification.</p>
+<p><strong>Confidentiality vs. Integrity:</strong> This attack succeeds even though confidentiality is maintained (the attacker encrypted a valid message). The problem is lack of integrity protection.</p>
+<p>The logs explain:</p>
+<pre><code>"Message Injection: Demonstrates encryption alone isn't enough"
+"Need for message authentication (HMAC/signatures)"
+</code></pre>
+<h4 id="624realworldcontext">6.2.4 Real-World Context</h4>
+<p>Message injection attacks are relevant in scenarios like:</p>
+<ul>
+<li>Compromised keys in long-lived sessions</li>
+<li>Insider threats (legitimate participants sending malicious content)</li>
+<li>Systems relying solely on encryption for security</li>
+</ul>
+<p>The defense is to add authentication layers:</p>
+<ul>
+<li>HMAC (Hash-based Message Authentication Code)</li>
+<li>Digital signatures</li>
+<li>Authenticated encryption modes (AES-GCM, ChaCha20-Poly1305)</li>
+</ul>
+<h3 id="63sessionhijackingmaninthemiddle">6.3 Session Hijacking (Man-in-the-Middle)</h3>
+<h4 id="631attackdescription">6.3.1 Attack Description</h4>
+<p>Session hijacking through man-in-the-middle (MITM) attacks involves an adversary intercepting communications between two parties and potentially impersonating one or both. In the context of Diffie-Hellman, an active MITM attacker could perform separate DH exchanges with each party, decrypting and re-encrypting all traffic.</p>
+<p>However, this simulation demonstrates that even a passive eavesdropper who intercepts the DH public key exchange cannot compute the shared secret.</p>
+<h4 id="632implementation">6.3.2 Implementation</h4>
+<p>The session hijacking simulation models a passive eavesdropper:</p>
+<pre><code>1. Attacker observes Client A's public key exchange
+
+2. Attacker generates their own DH key pair
+
+3. Attacker attempts to compute shared secret:
+   attacker_secret = client_a_public_key ^ attacker_private_key mod p
+
+4. System compares:
+   - Real shared secret (from both clients)
+   - Attacker's computed "secret"
+
+5. Demonstrate that keys don't match
+
+6. Log security analysis:
+   - MITM failed due to DH security
+   - Note: Active MITM (not simulated) would require additional defenses
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Session hijacking simulation showing key comparison and MITM failure</strong></p>
+<h4 id="633securityanalysis">6.3.3 Security Analysis</h4>
+<p>This simulation teaches several lessons about key exchange security:</p>
+<p><strong>Passive Eavesdropping Resistance:</strong> Classic DH ensures that observing the public key exchange doesn't reveal the shared secret. This relies on the computational difficulty of the discrete logarithm problem.</p>
+<p><strong>Mathematical Foundation:</strong> The attacker cannot compute g^(ab) from knowing only g^a and g^b without knowing either private exponent.</p>
+<p><strong>Active MITM Vulnerability:</strong> While passive eavesdropping fails, the simulation notes that an active attacker who intercepts and modifies the exchange could succeed. This requires authentication mechanisms like:</p>
+<ul>
+<li>Digital certificates</li>
+<li>Pre-shared authentication keys</li>
+<li>Digital signatures on public keys</li>
+</ul>
+<p>The logs explain:</p>
+<pre><code>"Attacker only has Client A's public key"
+"Attacker cannot compute correct shared secret"
+"Keys don't match! ✓"
+"MITM Attack: FAILED - DH is secure against passive eavesdropping ✓"
+"Note: Would need digital signatures to prevent active MITM"
+</code></pre>
+<h4 id="634realworldcontext">6.3.4 Real-World Context</h4>
+<p>DH security properties are fundamental to protocols like:</p>
+<ul>
+<li>TLS (Transport Layer Security) - uses authenticated DH</li>
+<li>IPsec - combines DH with authentication</li>
+<li>Signal Protocol - uses DH with identity verification</li>
+</ul>
+<p>The key lesson is that DH must be combined with authentication mechanisms for complete security against MITM attacks.</p>
+<h3 id="64floodingmessagesattack">6.4 Flooding Messages Attack</h3>
+<h4 id="641attackdescription">6.4.1 Attack Description</h4>
+<p>A flooding attack is a type of Denial-of-Service (DoS) attack where an adversary overwhelms a system with a large volume of messages, consuming resources and potentially making the service unavailable to legitimate users.</p>
+<p>This simulation demonstrates the impact of rapid, uncontrolled message transmission and the need for rate limiting defenses.</p>
+<h4 id="642implementation">6.4.2 Implementation</h4>
+<p>The flooding attack simulation creates rapid message traffic:</p>
+<pre><code>1. Loop 10 times (reduced from thousands to prevent actual GUI freezing):
+   a. Generate flood message: "FLOOD MESSAGE {i}"
+   b. Encrypt the message
+   c. Log the transmission
+
+2. After flooding sequence:
+   a. Log attack completion
+   b. Display defense recommendations:
+      - Rate limiting
+      - Connection throttling
+</code></pre>
+<p><strong>PLACEHOLDER FOR SCREENSHOT: Flooding attack showing multiple rapid messages in system logs</strong></p>
+<h4 id="643securityanalysis">6.4.3 Security Analysis</h4>
+<p>The flooding simulation illustrates:</p>
+<p><strong>Resource Exhaustion:</strong> Even with efficient encryption, processing thousands or millions of messages consumes CPU, memory, and bandwidth.</p>
+<p><strong>Availability Impact:</strong> If the GUI processed all messages synchronously, the interface would freeze, demonstrating unavailability.</p>
+<p><strong>Defense Mechanisms:</strong> The simulation recommends:</p>
+<ul>
+<li><strong>Rate Limiting:</strong> Restrict the number of messages per time period</li>
+<li><strong>Connection Throttling:</strong> Slow down or temporarily block suspicious sources</li>
+<li><strong>Resource Quotas:</strong> Limit memory/CPU usage per client</li>
+</ul>
+<p>The logs state:</p>
+<pre><code>"Flooding Attack: Simulating rapid message sending..."
+"Flood message 1/10 sent"
+...
+"Flooding Attack: Completed"
+"Defense: Rate limiting should be implemented"
+"Defense: Connection throttling recommended ✓"
+</code></pre>
+<h4 id="644realworldcontext">6.4.4 Real-World Context</h4>
+<p>Flooding attacks are common in:</p>
+<ul>
+<li>Chat applications (spam)</li>
+<li>Email systems (email bombs)</li>
+<li>Network protocols (SYN floods, UDP floods)</li>
+<li>Web services (HTTP request floods)</li>
+</ul>
+<p>Real-world defenses include:</p>
+<ul>
+<li>Application-level rate limiting</li>
+<li>Network-level throttling (firewalls, IDS/IPS)</li>
+<li>CAPTCHA for suspicious activity</li>
+<li>Distributed systems with load balancing</li>
+<li>Traffic analysis and anomaly detection</li>
+</ul>
+<h3 id="65attacksimulationsummary">6.5 Attack Simulation Summary</h3>
+<p>The four attack simulations collectively demonstrate:</p>
+<ol>
+<li><strong>Dictionary Attack:</strong> Strong cryptographic keys resist brute-force</li>
+<li><strong>Message Injection:</strong> Encryption alone doesn't guarantee authenticity</li>
+<li><strong>Session Hijacking:</strong> DH resists passive eavesdropping but needs authentication</li>
+<li><strong>Flooding:</strong> Availability requires resource management beyond encryption</li>
+</ol>
+<p>These simulations provide hands-on understanding of security principles that complement theoretical knowledge.</p>
+<p><strong>PLACEHOLDER FOR TABLE: Summary table of attacks, outcomes, and lessons learned</strong></p>
+<hr />
+<h2 id="7securityevaluation">7. Security Evaluation</h2>
+<p>This section provides a critical evaluation of the security properties of the implemented system, analyzing both strengths and areas requiring additional mechanisms.</p>
+<h3 id="71cryptographicstrengthassessment">7.1 Cryptographic Strength Assessment</h3>
+<h4 id="711aes256cbcevaluation">7.1.1 AES-256-CBC Evaluation</h4>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>AES-256 is a proven encryption algorithm with no known practical attacks</li>
+<li>CBC mode properly conceals patterns in plaintext</li>
+<li>Random IV generation prevents deterministic encryption</li>
+<li>PKCS#7 padding is correctly implemented through pycryptodome</li>
+<li>Key size (256 bits) provides long-term security</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li>CBC mode is vulnerable to padding oracle attacks if decryption errors are revealed to attackers (mitigated by not exposing detailed error information)</li>
+<li>No built-in integrity protection (ciphertext can be modified)</li>
+<li>Vulnerable to bit-flipping attacks (modifying ciphertext affects plaintext predictably)</li>
+</ul>
+<p><strong>Recommended Improvements:</strong></p>
+<ul>
+<li>Consider AES-GCM (Galois/Counter Mode) for authenticated encryption</li>
+<li>Add HMAC for explicit integrity verification</li>
+<li>Implement encrypt-then-MAC pattern</li>
+</ul>
+<h4 id="712diffiehellmanevaluation">7.1.2 Diffie-Hellman Evaluation</h4>
+<p><strong>Strengths:</strong></p>
+<ul>
+<li>Uses standardized 2048-bit parameters (RFC 3526 Group 14)</li>
+<li>Resistant to passive eavesdropping (discrete logarithm problem)</li>
+<li>No pre-shared secrets required</li>
+<li>Proper key derivation using SHA-256</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li>Vulnerable to active MITM attacks without authentication</li>
+<li>Ephemeral DH not implemented (same keys used throughout session)</li>
+<li>No perfect forward secrecy across sessions</li>
+<li>No identity verification of communication parties</li>
+</ul>
+<p><strong>Recommended Improvements:</strong></p>
+<ul>
+<li>Add certificate-based authentication</li>
+<li>Implement ephemeral DH with periodic rekeying</li>
+<li>Use authenticated DH variants (like in TLS)</li>
+<li>Add digital signatures to verify public keys</li>
+</ul>
+<h3 id="72implementationsecurity">7.2 Implementation Security</h3>
+<h4 id="721securecodingpractices">7.2.1 Secure Coding Practices</h4>
+<p><strong>Positive Aspects:</strong></p>
+<ul>
+<li>Uses well-tested cryptographic libraries (pycryptodome) instead of custom implementations</li>
+<li>Proper random number generation through OS-provided sources</li>
+<li>No hardcoded keys or secrets</li>
+<li>Clear separation between cryptographic and application logic</li>
+</ul>
+<p><strong>Areas for Improvement:</strong></p>
+<ul>
+<li>Key material stored in memory could be read by debuggers or memory dumps</li>
+<li>No secure deletion of sensitive data (Python garbage collection handles this, but not securely)</li>
+<li>Error messages could potentially leak information about decryption failures</li>
+</ul>
+<h4 id="722inputvalidation">7.2.2 Input Validation</h4>
+<p><strong>Current State:</strong></p>
+<ul>
+<li>Basic checks for empty messages</li>
+<li>Exception handling for encryption/decryption failures</li>
+</ul>
+<p><strong>Improvements Needed:</strong></p>
+<ul>
+<li>Validate ciphertext format before decryption attempts</li>
+<li>Implement maximum message length limits</li>
+<li>Sanitize input before logging (prevent log injection)</li>
+</ul>
+<h3 id="73protocolsecurity">7.3 Protocol Security</h3>
+<h4 id="731securitypropertiesachieved">7.3.1 Security Properties Achieved</h4>
+<p>✅ <strong>Confidentiality:</strong> Messages are encrypted with AES-256, preventing unauthorized reading</p>
+<p>✅ <strong>Key Agreement:</strong> DH enables secure key establishment without pre-shared secrets</p>
+<p>✅ <strong>Computational Security:</strong> Both AES and DH rely on computationally hard problems</p>
+<h4 id="732securitypropertiesnotachieved">7.3.2 Security Properties NOT Achieved</h4>
+<p>❌ <strong>Authentication:</strong> No verification of participant identities</p>
+<p>❌ <strong>Integrity:</strong> No protection against message modification</p>
+<p>❌ <strong>Non-repudiation:</strong> No proof of message origin</p>
+<p>❌ <strong>Perfect Forward Secrecy:</strong> Key compromise reveals all session messages</p>
+<p>❌ <strong>Replay Protection:</strong> No timestamps or sequence numbers (partially implemented in code but not in protocol)</p>
+<h3 id="74threatmodelanalysis">7.4 Threat Model Analysis</h3>
+<h4 id="741threatsdefendedagainst">7.4.1 Threats Defended Against</h4>
+<p><strong>Passive Eavesdropping:</strong> ✅ Protected by DH + AES encryption</p>
+<p><strong>Dictionary Attacks on Keys:</strong> ✅ Cryptographically random 256-bit keys</p>
+<p><strong>Pattern Analysis:</strong> ✅ CBC mode with random IVs prevents pattern detection</p>
+<h4 id="742threatsnotdefendedagainst">7.4.2 Threats NOT Defended Against</h4>
+<p><strong>Active Man-in-the-Middle:</strong> ❌ DH vulnerable without authentication</p>
+<p><strong>Message Tampering:</strong> ❌ No integrity verification</p>
+<p><strong>Replay Attacks:</strong> ❌ No protocol-level protection (code has partial implementation)</p>
+<p><strong>Key Compromise:</strong> ❌ No forward secrecy if keys leaked</p>
+<p><strong>Denial of Service:</strong> ⚠️ Limited rate limiting in simulation only</p>
+<h3 id="75comparisonwithproductionsystems">7.5 Comparison with Production Systems</h3>
+<p>To contextualize the security evaluation, it's useful to compare this educational implementation with production secure messaging systems:</p>
+<p><strong>Signal Protocol:</strong></p>
+<ul>
+<li>Uses authenticated encryption (AES-GCM or ChaCha20-Poly1305)</li>
+<li>Implements Double Ratchet for perfect forward secrecy</li>
+<li>Includes message authentication codes</li>
+<li>Verifies identity through key fingerprints</li>
+</ul>
+<p><strong>TLS 1.3:</strong></p>
+<ul>
+<li>Uses authenticated encryption exclusively</li>
+<li>Ephemeral DH with forward secrecy</li>
+<li>Certificate-based authentication</li>
+<li>Extensive security analysis and formal verification</li>
+</ul>
+<p><strong>Our Implementation:</strong></p>
+<ul>
+<li>Educational focus on core concepts</li>
+<li>Demonstrates fundamental mechanisms</li>
+<li>Deliberately simplified to highlight specific security properties</li>
+<li>Suitable for learning, not production use</li>
+</ul>
+<h3 id="76securitygrading">7.6 Security Grading</h3>
+<p>If we were to grade the security of this implementation:</p>
+<p><strong>Cryptographic Algorithms:</strong> A (uses strong, standard algorithms correctly)</p>
+<p><strong>Key Management:</strong> B+ (good DH implementation, but lacks authentication)</p>
+<p><strong>Protocol Design:</strong> B- (covers confidentiality well, weak on integrity/authentication)</p>
+<p><strong>Implementation Quality:</strong> B+ (uses secure libraries, good practices)</p>
+<p><strong>Production Readiness:</strong> D (educational tool, not suitable for real secrets)</p>
+<p><strong>Overall Security Assessment:</strong> B (solid educational implementation with known limitations)</p>
+<hr />
+<h2 id="8limitationsandfuturework">8. Limitations and Future Work</h2>
+<p>This section honestly discusses the limitations of the current implementation and proposes concrete improvements for future iterations.</p>
+<h3 id="81currentlimitations">8.1 Current Limitations</h3>
+<h4 id="811cryptographiclimitations">8.1.1 Cryptographic Limitations</h4>
+<p><strong>No Message Authentication:</strong><br />
+The most significant limitation is the absence of message authentication codes (MACs) or digital signatures. This means:</p>
+<ul>
+<li>An attacker who obtains the key can forge messages</li>
+<li>Message tampering goes undetected</li>
+<li>No proof of message origin</li>
+</ul>
+<p><strong>Future Work:</strong> Implement HMAC-SHA256 for message authentication or upgrade to AES-GCM which provides built-in authentication.</p>
+<p><strong>Static Key Exchange:</strong><br />
+DH keys are generated once at startup and reused for the entire session:</p>
+<ul>
+<li>If keys are compromised, all messages can be decrypted</li>
+<li>No perfect forward secrecy between messages</li>
+</ul>
+<p><strong>Future Work:</strong> Implement ephemeral DH with periodic rekeying (e.g., new DH exchange every N messages or every M minutes).</p>
+<p><strong>No Identity Verification:</strong><br />
+The system cannot verify who it's communicating with:</p>
+<ul>
+<li>Vulnerable to active MITM attacks</li>
+<li>No way to ensure you're talking to the intended party</li>
+</ul>
+<p><strong>Future Work:</strong> Add certificate-based authentication using X.509 certificates or implement a trust-on-first-use (TOFU) model with key fingerprint verification.</p>
+<h4 id="812protocollimitations">8.1.2 Protocol Limitations</h4>
+<p><strong>Single-Instance Simulation:</strong><br />
+Both "clients" run in the same application:</p>
+<ul>
+<li>Not a true network protocol implementation</li>
+<li>Cannot demonstrate network-level attacks</li>
+<li>Limited realism for understanding distributed systems</li>
+</ul>
+<p><strong>Future Work:</strong> Implement actual network sockets (TCP/UDP) with client-server architecture to enable true multi-machine communication.</p>
+<p><strong>No Session Management:</strong><br />
+The application has no concept of sessions:</p>
+<ul>
+<li>Cannot handle reconnections</li>
+<li>No state persistence</li>
+<li>No session timeout or key rotation</li>
+</ul>
+<p><strong>Future Work:</strong> Implement session identifiers, timeouts, and renegotiation triggers.</p>
+<p><strong>Limited Replay Protection:</strong><br />
+While the code includes message hash tracking, it's not part of the core protocol:</p>
+<ul>
+<li>No timestamps embedded in messages</li>
+<li>Hash-based protection is easily bypassed</li>
+<li>No sequence numbers</li>
+</ul>
+<p><strong>Future Work:</strong> Add protocol-level sequence numbers and timestamps, implement a proper nonce-based replay protection mechanism.</p>
+<h4 id="813implementationlimitations">8.1.3 Implementation Limitations</h4>
+<p><strong>GUI Thread Blocking:</strong><br />
+Heavy cryptographic operations run on the main GUI thread:</p>
+<ul>
+<li>Could cause UI freezing with large messages</li>
+<li>Flooding attack demonstration limited to prevent freezing</li>
+</ul>
+<p><strong>Future Work:</strong> Move cryptographic operations to background threads using PyQt's QThread or Python's threading/asyncio.</p>
+<p><strong>No Secure Memory:</strong><br />
+Sensitive data (keys, plaintext) stored in regular Python strings:</p>
+<ul>
+<li>Vulnerable to memory dumps</li>
+<li>Cannot securely erase from memory</li>
+<li>Swap space could contain secrets</li>
+</ul>
+<p><strong>Future Work:</strong> Investigate Python libraries for secure memory handling (though Python's architecture makes this challenging).</p>
+<p><strong>Limited Error Handling:</strong><br />
+Error messages could leak information:</p>
+<ul>
+<li>Decryption failures reveal padding errors</li>
+<li>Could enable padding oracle attacks in theory</li>
+</ul>
+<p><strong>Future Work:</strong> Implement constant-time comparison and uniform error messages.</p>
+<h3 id="82missingsecurityfeatures">8.2 Missing Security Features</h3>
+<p><strong>Digital Signatures:</strong><br />
+No implementation of RSA, ECDSA, or other signature schemes:</p>
+<ul>
+<li>Cannot prove message origin</li>
+<li>No non-repudiation</li>
+</ul>
+<p><strong>Future Work:</strong> Add RSA signature generation and verification to complement encryption.</p>
+<p><strong>Certificate Infrastructure:</strong><br />
+No PKI (Public Key Infrastructure):</p>
+<ul>
+<li>Cannot verify public keys</li>
+<li>No trust chain</li>
+</ul>
+<p><strong>Future Work:</strong> Implement a simple certificate system or integrate with existing PKI.</p>
+<p><strong>Key Storage:</strong><br />
+Keys exist only in memory:</p>
+<ul>
+<li>Lost when application closes</li>
+<li>Cannot save session for later</li>
+</ul>
+<p><strong>Future Work:</strong> Implement secure key storage (encrypted keystore file) with master password protection.</p>
+<h3 id="83usabilitylimitations">8.3 Usability Limitations</h3>
+<p><strong>No Multi-User Support:</strong><br />
+Only simulates two clients:</p>
+<ul>
+<li>Cannot demonstrate group communication</li>
+<li>No contact management</li>
+</ul>
+<p><strong>Future Work:</strong> Extend to support multiple clients with roster management.</p>
+<p><strong>No Message History:</strong><br />
+Messages disappear when overwritten:</p>
+<ul>
+<li>Cannot review conversation</li>
+<li>No persistent storage</li>
+</ul>
+<p><strong>Future Work:</strong> Implement message database with encryption at rest.</p>
+<p><strong>Limited File Support:</strong><br />
+Text messages only:</p>
+<ul>
+<li>Cannot send files</li>
+<li>Cannot send images</li>
+</ul>
+<p><strong>Future Work:</strong> Add file transfer capability with progress indicators.</p>
+<h3 id="84proposedenhancements">8.4 Proposed Enhancements</h3>
+<h4 id="841shorttermimprovements12weeks">8.4.1 Short-Term Improvements (1-2 weeks)</h4>
+<ol>
+<li><strong>Add HMAC:</strong> Implement message authentication using HMAC-SHA256</li>
+<li><strong>Improve Logging:</strong> Add timestamps to all log entries</li>
+<li><strong>Input Validation:</strong> Implement maximum message length and format validation</li>
+<li><strong>Better Error Handling:</strong> Uniform error messages, no information leakage</li>
+</ol>
+<h4 id="842mediumtermimprovements1month">8.4.2 Medium-Term Improvements (1 month)</h4>
+<ol>
+<li><strong>Network Implementation:</strong> Convert to client-server architecture with sockets</li>
+<li><strong>Key Fingerprints:</strong> Display SHA-256 fingerprints of public keys for manual verification</li>
+<li><strong>Session Management:</strong> Implement session IDs and timeout mechanisms</li>
+<li><strong>Threading:</strong> Move crypto operations off GUI thread</li>
+</ol>
+<h4 id="843longtermimprovements23months">8.4.3 Long-Term Improvements (2-3 months)</h4>
+<ol>
+<li><strong>Upgrade to AES-GCM:</strong> Replace CBC+HMAC with authenticated encryption</li>
+<li><strong>Perfect Forward Secrecy:</strong> Implement Double Ratchet or Signal Protocol</li>
+<li><strong>Certificate Support:</strong> Add X.509 certificate generation and verification</li>
+<li><strong>Message Persistence:</strong> Encrypted database for message history</li>
+<li><strong>Group Messaging:</strong> Support for multi-party conversations</li>
+<li><strong>File Transfer:</strong> Binary file support with chunking and progress tracking</li>
+</ol>
+<h3 id="85educationalvaluevsproductionuse">8.5 Educational Value vs. Production Use</h3>
+<p>It's important to emphasize that this project was designed primarily for educational purposes. The limitations discussed are deliberate simplifications to focus on core concepts:</p>
+<p><strong>Educational Strengths:</strong></p>
+<ul>
+<li>Clear demonstration of fundamental cryptographic principles</li>
+<li>Interactive visualization of abstract concepts</li>
+<li>Hands-on experience with security tradeoffs</li>
+<li>Exposes students to real cryptographic libraries</li>
+</ul>
+<p><strong>Why Not Production-Ready:</strong></p>
+<ul>
+<li>Missing critical security features (authentication, integrity)</li>
+<li>Single-instance simulation</li>
+<li>No formal security analysis or penetration testing</li>
+<li>Not designed for adversarial environments</li>
+</ul>
+<p>Students and reviewers should understand that building production secure messaging requires:</p>
+<ul>
+<li>Formal security protocol design</li>
+<li>Extensive testing and auditing</li>
+<li>Defense-in-depth approach</li>
+<li>Ongoing maintenance and updates</li>
+<li>Compliance with standards and regulations</li>
+</ul>
+<p>This project succeeds as a learning tool while acknowledging that real-world security demands significantly more comprehensive implementation.</p>
+<hr />
+<h2 id="9conclusion">9. Conclusion</h2>
+<h3 id="91summaryofachievements">9.1 Summary of Achievements</h3>
+<p>This project successfully demonstrates the implementation of a secure communication system according to the P01 bucket specifications. The key achievements include:</p>
+<p><strong>Cryptographic Implementation:</strong><br />
+We implemented AES-256 encryption in CBC mode with PKCS#7 padding, providing strong confidentiality for messages. The use of random initialization vectors for each message ensures that identical plaintexts produce different ciphertexts, preventing pattern analysis.</p>
+<p><strong>Key Exchange Protocol:</strong><br />
+The classic Diffie-Hellman implementation using RFC 3526 standardized parameters enables two parties to establish a shared secret key without any prior secure communication channel. The key derivation using SHA-256 ensures compatibility with AES-256.</p>
+<p><strong>User Interface:</strong><br />
+The PyQt5-based desktop application provides an intuitive interface for observing cryptographic operations in real-time. The clear separation between the two clients and comprehensive logging helps users understand the message flow and security events.</p>
+<p><strong>Attack Simulations:</strong><br />
+Four distinct attacks were implemented and demonstrated:</p>
+<ul>
+<li>Dictionary attacks showing the computational infeasibility of brute-forcing strong keys</li>
+<li>Message injection illustrating the difference between confidentiality and authentication</li>
+<li>Session hijacking demonstrating DH's resistance to passive eavesdropping</li>
+<li>Message flooding highlighting the need for availability protections</li>
+</ul>
+<p><strong>Educational Impact:</strong><br />
+The project successfully bridges the gap between theoretical cryptography and practical implementation, providing hands-on experience with security concepts that are often presented only abstractly.</p>
+<h3 id="92lessonslearned">9.2 Lessons Learned</h3>
+<p>Through the development and analysis of this project, several important lessons emerged:</p>
+<p><strong>Cryptography is Complex:</strong><br />
+Even implementing "simple" encryption requires careful attention to details like padding, IV generation, and key derivation. Using well-tested libraries is essential to avoid implementation vulnerabilities.</p>
+<p><strong>Encryption Alone is Insufficient:</strong><br />
+The message injection attack clearly demonstrates that confidentiality does not imply integrity or authentication. Secure systems require multiple complementary mechanisms.</p>
+<p><strong>Security is a Spectrum:</strong><br />
+There is no absolute security, only security appropriate to the threat model. This educational implementation makes different tradeoffs than a production system would.</p>
+<p><strong>Usability Matters:</strong><br />
+Security features that are difficult to use correctly will be misused or avoided. The GUI design aimed to make cryptographic operations understandable and accessible.</p>
+<p><strong>Limitations Must Be Acknowledged:</strong><br />
+Understanding what a system does NOT protect against is as important as understanding what it does protect. Honest assessment of limitations enables better security decisions.</p>
+<h3 id="93meetingprojectobjectives">9.3 Meeting Project Objectives</h3>
+<p>Reviewing the objectives stated in Section 2:</p>
+<p>✅ <strong>Objective 1 (Symmetric Encryption):</strong> Successfully implemented AES-256-CBC with PKCS#7 padding</p>
+<p>✅ <strong>Objective 2 (Key Exchange):</strong> Successfully implemented classic Diffie-Hellman with proper parameter selection</p>
+<p>✅ <strong>Objective 3 (User Interface):</strong> Created intuitive desktop GUI with clear feedback</p>
+<p>✅ <strong>Objective 4 (Attack Simulations):</strong> Implemented all four required attacks (Dictionary, Message Injection, Session Hijacking, Flooding)</p>
+<p>✅ <strong>Objective 5 (Security Principles):</strong> Demonstrated confidentiality, key management challenges, and the distinction between encryption and authentication</p>
+<p>All primary objectives were met according to the P01 bucket specifications.</p>
+<h3 id="94contributiontoinformationsecurityeducation">9.4 Contribution to Information Security Education</h3>
+<p>This project contributes to information security education in several ways:</p>
+<p><strong>Practical Experience:</strong> Students gain hands-on experience with cryptographic libraries and protocols, complementing theoretical coursework.</p>
+<p><strong>Visual Learning:</strong> The GUI provides immediate visual feedback on encryption transformations, making abstract concepts concrete.</p>
+<p><strong>Attack Understanding:</strong> The simulations help students develop an adversarial mindset, understanding both how attacks work and how defenses function.</p>
+<p><strong>Code Review Opportunity:</strong> The source code serves as a reference implementation that students can study, modify, and extend.</p>
+<p><strong>Portfolio Piece:</strong> The project demonstrates competency in security programming suitable for academic or professional portfolios.</p>
+<h3 id="95finalthoughts">9.5 Final Thoughts</h3>
+<p>Secure communication is fundamental to modern computing, from messaging apps to financial transactions to military communications. Understanding the building blocks—encryption algorithms, key exchange protocols, and security attacks—is essential for anyone working in information technology.</p>
+<p>This project provides a foundation for that understanding. While the implementation is intentionally simplified for educational purposes, the core concepts demonstrated here—AES encryption, Diffie-Hellman key exchange, and security attack patterns—are the same principles underlying production systems used by billions of people daily.</p>
+<p>The limitations and missing features discussed in Section 8 are not failures but rather opportunities for future learning. Understanding what makes a truly secure system requires first understanding the basics, then gradually adding layers of sophistication: authentication, forward secrecy, secure channels, and defense-in-depth.</p>
+<p>We hope this project serves not as an endpoint but as a starting point for deeper exploration of cryptography and information security. The field is vast, constantly evolving, and critically important. Every student who gains practical understanding of these concepts becomes better equipped to build the secure systems our digital society depends upon.</p>
+<h3 id="96recommendationsforusers">9.6 Recommendations for Users</h3>
+<p>For students and instructors using this project:</p>
+<p><strong>Students:</strong></p>
+<ul>
+<li>Experiment with the code—modify parameters, add features, break things</li>
+<li>Read the source code carefully to understand implementation details</li>
+<li>Try to exploit the limitations discussed in Section 8</li>
+<li>Research how production systems address these limitations</li>
+<li>Consider this a starting point for further study, not a complete solution</li>
+</ul>
+<p><strong>Instructors:</strong></p>
+<ul>
+<li>Use this as a demonstration tool in cryptography lectures</li>
+<li>Assign extensions as homework (add HMAC, implement RSA signatures, etc.)</li>
+<li>Have students conduct security reviews and propose improvements</li>
+<li>Encourage students to implement the future work items</li>
+<li>Emphasize both what works and what's missing</li>
+</ul>
+<p><strong>Security Professionals:</strong></p>
+<ul>
+<li>Recognize this as an educational tool, not production code</li>
+<li>Use it to explain concepts to non-technical stakeholders</li>
+<li>Consider it a template for more sophisticated implementations</li>
+<li>Appreciate the value of simple demonstrations in security education</li>
+</ul>
+<hr />
+<h2 id="10references">10. References</h2>
+<h3 id="101cryptographicstandards">10.1 Cryptographic Standards</h3>
+<p>[1] National Institute of Standards and Technology (NIST). "Advanced Encryption Standard (AES)." FIPS PUB 197, November 2001.<br />
+<a href="https://csrc.nist.gov/publications/detail/fips/197/final">https://csrc.nist.gov/publications/detail/fips/197/final</a></p>
+<p>[2] National Institute of Standards and Technology (NIST). "Recommendation for Block Cipher Modes of Operation." SP 800-38A, December 2001.<br />
+<a href="https://csrc.nist.gov/publications/detail/sp/800-38a/final">https://csrc.nist.gov/publications/detail/sp/800-38a/final</a></p>
+<p>[3] Krawczyk, H., Bellare, M., and R. Canetti. "HMAC: Keyed-Hashing for Message Authentication." RFC 2104, February 1997.<br />
+<a href="https://www.rfc-editor.org/rfc/rfc2104">https://www.rfc-editor.org/rfc/rfc2104</a></p>
+<p>[4] Kivinen, T. and M. Kojo. "More Modular Exponential (MODP) Diffie-Hellman groups for Internet Key Exchange (IKE)." RFC 3526, May 2003.<br />
+<a href="https://www.rfc-editor.org/rfc/rfc3526">https://www.rfc-editor.org/rfc/rfc3526</a></p>
+<h3 id="102cryptographicalgorithms">10.2 Cryptographic Algorithms</h3>
+<p>[5] Daemen, J. and V. Rijmen. "The Design of Rijndael: AES - The Advanced Encryption Standard." Springer-Verlag, 2002.</p>
+<p>[6] Diffie, W. and M. Hellman. "New Directions in Cryptography." IEEE Transactions on Information Theory, vol. IT-22, no. 6, pp. 644-654, November 1976.</p>
+<p>[7] Kaliski, B. "PKCS #7: Cryptographic Message Syntax Version 1.5." RFC 2315, March 1998.<br />
+<a href="https://www.rfc-editor.org/rfc/rfc2315">https://www.rfc-editor.org/rfc/rfc2315</a></p>
+<h3 id="103securityanalysis">10.3 Security Analysis</h3>
+<p>[8] Ferguson, N., Schneier, B., and T. Kohno. "Cryptography Engineering: Design Principles and Practical Applications." Wiley, 2010.</p>
+<p>[9] Menezes, A., van Oorschot, P., and S. Vanstone. "Handbook of Applied Cryptography." CRC Press, 1996.<br />
+<a href="http://cacr.uwaterloo.ca/hac/">http://cacr.uwaterloo.ca/hac/</a></p>
+<p>[10] Katz, J. and Y. Lindell. "Introduction to Modern Cryptography." 2nd Edition, CRC Press, 2014.</p>
+<h3 id="104implementationresources">10.4 Implementation Resources</h3>
+<p>[11] Python Software Foundation. "secrets — Generate secure random numbers for managing secrets." Python Documentation.<br />
+<a href="https://docs.python.org/3/library/secrets.html">https://docs.python.org/3/library/secrets.html</a></p>
+<p>[12] Pycryptodome Contributors. "PyCryptodome Documentation." Version 3.20.0.<br />
+<a href="https://pycryptodome.readthedocs.io/">https://pycryptodome.readthedocs.io/</a></p>
+<p>[13] Riverbank Computing Limited. "PyQt5 Reference Guide." 2023.<br />
+<a href="https://www.riverbankcomputing.com/static/Docs/PyQt5/">https://www.riverbankcomputing.com/static/Docs/PyQt5/</a></p>
+<h3 id="105attackmethodologies">10.5 Attack Methodologies</h3>
+<p>[14] Vaudenay, S. "Security Flaws Induced by CBC Padding." Advances in Cryptology - EUROCRYPT 2002, pp. 534-545, 2002.</p>
+<p>[15] Bleichenbacher, D. "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS #1." Advances in Cryptology - CRYPTO '98, pp. 1-12, 1998.</p>
+<p>[16] Joux, A., Vitse, V. "Elliptic Curve Discrete Logarithm Problem over Small Degree Extension Fields." Journal of Cryptology, vol. 26, no. 1, pp. 119-143, 2013.</p>
+<h3 id="106relatedprojectsandprotocols">10.6 Related Projects and Protocols</h3>
+<p>[17] Signal. "Signal Protocol." Technical Documentation.<br />
+<a href="https://signal.org/docs/">https://signal.org/docs/</a></p>
+<p>[18] Rescorla, E. "The Transport Layer Security (TLS) Protocol Version 1.3." RFC 8446, August 2018.<br />
+<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a></p>
+<p>[19] OpenSSL Project. "OpenSSL Cryptography and SSL/TLS Toolkit."<br />
+<a href="https://www.openssl.org/">https://www.openssl.org/</a></p>
+<h3 id="107educationalresources">10.7 Educational Resources</h3>
+<p>[20] Boneh, D. and V. Shoup. "A Graduate Course in Applied Cryptography." Stanford University, 2020.<br />
+<a href="https://toc.cryptobook.us/">https://toc.cryptobook.us/</a></p>
+<p>[21] Stallings, W. "Cryptography and Network Security: Principles and Practice." 8th Edition, Pearson, 2020.</p>
+<hr />
+<h2 id="appendixainstallationinstructions">Appendix A: Installation Instructions</h2>
+<p>Detailed installation instructions are provided in the USER_GUIDE.md document. For quick reference:</p>
+<pre><code class="bash language-bash"># Install virtual environment support
+sudo apt install python3-venv  # Debian/Ubuntu
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Linux/macOS
+# OR
+venv\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run application
+python GUI/main_window.py
+</code></pre>
+<hr />
+<h2 id="appendixbcodestructure">Appendix B: Code Structure</h2>
+<pre><code>ics344_project/
+├── README.md                   # Project overview and documentation
+├── USER_GUIDE.md              # User manual
+├── TECHNICAL_REPORT.md        # This document
+├── requirements.txt           # Python dependencies
+├── .gitignore                 # Git exclusions
+│
+├── diffie_hellman.py          # Diffie-Hellman implementation
+├── aes_encryption.py          # AES-CBC encryption/decryption
+│
+└── GUI/
+    ├── main_gui.ui            # Qt Designer UI definition
+    ├── gui.py                 # Auto-generated PyQt5 code
+    └── main_window.py         # Application logic and attacks
+</code></pre>
+<hr />
+<h2 id="appendixcglossary">Appendix C: Glossary</h2>
+<p><strong>AES (Advanced Encryption Standard):</strong> Symmetric encryption algorithm using 128-bit blocks</p>
+<p><strong>CBC (Cipher Block Chaining):</strong> Block cipher mode where each block is XORed with previous ciphertext</p>
+<p><strong>DH (Diffie-Hellman):</strong> Key exchange protocol based on discrete logarithm problem</p>
+<p><strong>HMAC:</strong> Hash-based Message Authentication Code for verifying integrity and authenticity</p>
+<p><strong>IV (Initialization Vector):</strong> Random value used to initialize CBC mode encryption</p>
+<p><strong>MAC (Message Authentication Code):</strong> Cryptographic checksum to verify message integrity</p>
+<p><strong>MITM (Man-in-the-Middle):</strong> Attack where adversary intercepts communication</p>
+<p><strong>PKCS#7:</strong> Padding scheme for block ciphers</p>
+<p><strong>SHA-256:</strong> Cryptographic hash function producing 256-bit output</p>
+<hr />
+<p><strong>End of Technical Report</strong></p>
+<p><strong>Document Information:</strong></p>
+<ul>
+<li>Version: 1.0</li>
+<li>Date: November 2025</li>
+<li>Pages: ~15 pages (formatted)</li>
+<li>Project: ICS344 Secure Communication System</li>
+<li>Bucket: P01</li>
+</ul>
+      </body>
+      </html>
+    
