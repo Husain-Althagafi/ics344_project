@@ -1,4 +1,9 @@
+altgraph==0.17.5
+packaging==25.0
 pycryptodome==3.20.0
-PyQt5==5.15.11
-PyQt5-Qt5==5.15.17
-PyQt5_sip==12.17.1
+pyinstaller==6.16.0
+pyinstaller-hooks-contrib==2025.10
+pyqt5==5.15.11
+pyqt5-qt5==5.15.17
+pyqt5-sip==12.17.1
+setuptools==80.9.0
