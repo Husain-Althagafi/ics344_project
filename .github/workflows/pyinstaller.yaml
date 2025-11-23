@@ -17,6 +17,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        include : 
+          - os: windows-latest
+            req: requirements-windows.txt
+          - os: ubuntu-latest
+            req: requirements.txt
+          - os: macos-latest
+            req: requirements.txt
         py: ["3.13.9"]
     runs-on: ${{ matrix.os }}
 
@@ -33,7 +40,7 @@ jobs:
         run: |
           pip install uv
           uv venv
-          uv pip install -r requirements.txt
+          uv pip install -r "${{ matrix.req }}"
         shell: bash
 
       - name: Verify entry file
