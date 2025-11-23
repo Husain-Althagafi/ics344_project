@@ -12,7 +12,7 @@ permissions:
 
 env:
   APP_NAME: ics344_project
-  APP_ENTRY: GUI/main_window.py  
+  APP_ENTRY: run_app.py 
 
 jobs:
   build:

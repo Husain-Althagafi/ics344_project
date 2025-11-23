@@ -11,8 +11,8 @@ from collections import deque
 
 # Add parent directory to path to import aes_encryption and diffie_hellman
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from aes_encryption import AESEncryption
-from diffie_hellman import DiffieHellman
+from ics344_PROJECT.aes_encryption import AESEncryption
+from ics344_PROJECT.diffie_hellman import DiffieHellman
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
