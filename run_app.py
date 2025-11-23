@@ -1,4 +1,4 @@
-from ICS344_PROJECT.GUI.main_window import main
+from ics344_project.GUI.main_window import main
 
 if __name__ == "__main__":
     main()
