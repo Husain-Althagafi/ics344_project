@@ -4,7 +4,7 @@ Handles all the logic and connects the GUI buttons to functionality
 """
 import sys
 from PyQt5 import QtWidgets, QtGui
-from GUI.gui import Ui_MainWindow, QtCore
+from ics344_project.GUI.gui import Ui_MainWindow, QtCore
 import sys
 import os
 from collections import deque
